@@ -23,6 +23,7 @@ knitr::opts_chunk$set(echo = F)
 require(tidyverse)
 require(ggrepel)
 require(patchwork)
+require(knitr)
 paper_theme <- theme_classic() + theme(panel.background = element_rect(fill = "white"),
   panel.grid.major = element_line(colour = "grey80", linetype="dashed", size=.25)) + 
   theme(
@@ -174,6 +175,16 @@ f3 %>% gather("key","value",g,h) %>%
 
 # Main document tables
 
+## Table 1
+
+```{r,echo=F,message=F}
+t1 <- read_tsv("table1.txt")
+t1$p_total_growth <- t1$p_total_growth * 100
+t1$f_growth <- t1$f_growth * 100
+t1 <- t1[c(1,2,3,4,6,5)]
+kable(t1,col.names = c("OECD Major field","Minor field","$N$","$G$","%","$\\Delta$"),digits = 1,caption="Trends in citation concentration by field. The table reports the number ($G$) and percentage ($\\%$) of all WoS subject categories ($N$) grouped under each OECD major and minor field of science that had $>10\\%$ increase in citation concentration in the period 2012-2017 compared to the period 2000-2005. Moreover, it specifies the relative increase in concentration for each OECD minor field ($\\Delta$). Here, concentration is measured as the citation shares accrued by the top $1\\%$ most cited authors within each subfield. ")
+```
+
 # Supplementary figures
 
 ## Figure S1
@@ -223,3 +234,14 @@ ps3 / ps1 + plot_layout(guides = "collect")
 ```
 
 # Supplementary tables
+
+## Table S1
+
+```{r,echo=F,message=F}
+ts1 <- read_tsv("table_s1.txt")
+ts1 <- ts1[c(5,2,3,4)]
+ts1$top1 <- ts1$top1 * 100
+ts1$top2 <- ts1$top2 * 100
+ts1$grow <- ts1$grow * 100
+kable(ts1,col.names = c("WoS Subject category","$c$(2000-2005)","$c$(2012-2017)","Relative change"),digits = 1,caption="Overview of the concentration, $c$, of citations given to authors in the 99th percentile (i.e. the top 1% most cited) in the periods 2000-2005 and 2012-2017, grouped by Web of Science journal subject category. The rightmost column is the relative change from the early to the late period.")
+```

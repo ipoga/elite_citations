@@ -1,0 +1,16 @@
+major_field	minor_field	n_field	n_growth	p_total_growth	f_growth
+Agricultural Sciences	Agriculture, forestry, fisheries	6	3	0.09408572385982095	0.5
+Agricultural Sciences	Animal and dairy science	1	0	0.07976026648752788	0
+Agricultural Sciences	Other agricultural science	2	2	0.12835493048885183	1
+Agricultural Sciences	Veterinary science	1	0	0.0240885723516584	0
+Engineering and Technology	Other engineering and technologies	1	1	0.12582536744325168	1
+Medical and Health Sciences	Basic medical research	10	4	0.07567849848001029	0.4
+Medical and Health Sciences	Clinical medicine	32	25	0.334096515771932	0.78125
+Medical and Health Sciences	Health sciences	12	6	0.33545566641036295	0.5
+Natural Sciences	Biological sciences	21	5	0.101399550626327	0.23809523809523808
+Natural Sciences	Chemical sciences	9	1	-0.02860727906090077	0.1111111111111111
+Natural Sciences	Computer and information sciences	1	0	-0.09595226713640448	0
+Natural Sciences	Earth and related environmental sciences	8	1	0.059175533945607484	0.125
+Natural Sciences	Mathematics	4	1	-0.013484064614349145	0.25
+Natural Sciences	Other natural sciences	1	1	0.11101658017355542	1
+Natural Sciences	Physical sciences and astronomy	10	1	0.005377477383301521	0.1
