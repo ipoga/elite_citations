@@ -18,31 +18,14 @@ output:
 ---
 
 ```{r setup, include=FALSE,echo=F}
-knitr::opts_chunk$set(echo = F)
+knitr::opts_chunk$set(echo = F, message = F, warning = F)
 
 require(tidyverse)
 require(ggrepel)
 require(patchwork)
 require(knitr)
-paper_theme <- theme_classic() + theme(panel.background = element_rect(fill = "white"),
-  panel.grid.major = element_line(colour = "grey80", linetype="dashed", size=.25)) + 
-  theme(
-    legend.position="bottom",
-    legend.box = "horizontal",
-    plot.title = element_text(size = 11),
-    plot.subtitle = element_text(size = 10),
-    axis.title = element_text(size = 10),
-    legend.title = element_text(size = 10),
-    legend.spacing = unit(0,"cm"),
-    legend.box.spacing = unit(0,"cm"))
-theme_set(paper_theme)
-elite_cols <- c("#000000","#A61A00","#0A7EA4","#FFDF00","#5B2333")
 
-load("fig0_data.Rdat")
-load("fig1_data.Rdat")
-load("fig2_data.Rdat")
-load("fig2b_data.Rdat")
-load("fig3_data.Rdat")
+elite_cols <- c("#000000","#A61A00","#0A7EA4","#FFDF00","#5B2333")
 
 ```
 
@@ -50,127 +33,56 @@ load("fig3_data.Rdat")
 
 This is a document containing the tables and figures for a study on the inequality and concentration of per-author citation distributions by Mathias W. Nielsen and Jens Peter Andersen. The source code can be found at: https://github.com/ipoga/elite_citations/
 
+This version is updated to match revisions after first round of peer review.
+
 # Main document figures
 
 ## Figure 1
 
-```{r,fig.cap="The rise in citation concentration for the top 1%. **(a)** Changes over time in the share of total, inflation-adjusted citations (*nics*) accrued by the top 1% from 2000 to 2017. Shaded areas indicate 95% confidence intervals of the fitted lines. **(b)** The relative growth in average publication output (per author) for the top 1% (99th percentile), top 25% (75th percentile) and the full WoS sample based on a full and fractional counting of papers. The Y axis has been rescaled to index 100 in year 2000.",fig.width=8,fig.height=4}
+```{r,fig.cap="The rise in citation concentration for the 1% most cited as total, inflation-adjusted citations (*nics*) cumulated per year from 2000 to 2015. Solid dots show the proportion based on full-count citation rates per article. The hollow dots show the fractional count citation proportion in which the score of each article is divided by the number of authors. **(A)** shows the proportion for all authors in the set. In **(B)** the sample is restricted to authors in physics and astronomy. **(C)** covers all authors in **(A)**, excluding authors in physics and astronomy.",fig.width=8,fig.height=8}
 
-p1 <- f1 %>%
-  gather("indi","val",ncs_inf,ncs_inf_full) %>%
-  mutate(indi_g = case_when(
-    indi == "ncs_inf" ~ "b",
-    indi == "ncs_inf_full" ~ "a",
-  )) %>%
-  ggplot(aes(x = y, y = val, color = indi_g, group = indi_g)) + 
-  geom_point() + 
-  geom_smooth(method='lm',aes(fill=indi_g),alpha=.1,size=.5) +
-  scale_y_continuous("Proportion of all citations") + 
-  scale_color_manual(guide = F, values=elite_cols[1:2]) +
-  scale_fill_manual(guide = F, values=elite_cols[1:2])
-
-p2 <- f1 %>%
-  gather("key","indi",n1,n75,p1,p75,n_all,p_all) %>%
-  mutate(key_type = case_when(
-    key == "n1" | key == "n75" | key == "n_all" ~ "a",
-    key == "p1" | key == "p75" | key == "p_all" ~ "b"
-    
-  ), lvl = case_when(
-    key == "p1" | key == "n1" ~ "a",
-    key == "p75" | key == "n75" ~ "b",
-    key == "n_all" | key == "p_all" ~ "c"
-  )) %>%
-  group_by(key) %>%
-  mutate(indi_i = indi / indi[y == 2000] * 100) %>%
-  ggplot(aes(x = y, y = indi_i, color = key_type)) +
-  geom_line(aes(linetype = lvl),size=.5) +
-  scale_x_continuous("Year") + 
-  scale_y_continuous("Relative growth",limits=c(50,150)) + 
-  scale_linetype_discrete("Percentile",labels=c("99th","75th","All")) +
-  scale_color_manual("Count",label=c("Full","Fractional"), values=elite_cols[1:2])
-
-p1 + p2 + plot_layout(guides = "collect") + plot_annotation(tag_levels = 'a')
+source("figures/figure_1_gen.R")
+plot
 ```
 
 ## Figure 2
 
-```{r,fig.cap="Citation gap. **(a)** Plot of citation density (full count) by fraction of authors, stratified by 6-year intervals. The x-axis is on a logarithmic scale. **(b)** Lorenz curve of citation density (full count) by percentile rank, stratified by 6-year intervals. The x-axis is on a regular scale. **(c)** Growth in the Herfindahl-Hirschman index of citation concentration from 2000 to 2017.",fig.width=8,fig.height=8}
+```{r,fig.cap="Publication, citation and collaboration trends. **(A)** plots changes over time in the share of total papers accrued by the top 1% (99th percentile), 75th and 50th percentile from 2000-2015. **(B)** plots the relative growth in average publication output per year (per author) for the top 99th, 75th and 50th percentile based on a full and fractional counting of papers. **(C)** presents the mean citation rate per paper (per year) for the 99th percentile. **(D)** shows the mean proportion of papers with at least one co-author for the 99th, 75th and 50th percentile. **(E)** displays the average number of co-authors per year for the 50th, 75th and 99th percentile. **(F)** plots the annual mean and median number of co-authors per paper for authors in the three percentile bins. In all panels, the black lines and dots show the 99th percentile, red shows the 75th percentile and blue shows the 50th percentile. Solid dots show the scores by full count and hollow dots show fractional counts. Solid squares show the median and hollow squares show the mean. **(B)**, **(C)** and **(F)** are split into two facets with common x-axes and individual y-axes.",fig.width=8,fig.height=6}
 
-f2b$period <- paste(f2b$y,f2b$y+5,sep="-")
-f2a$period <- paste(f2a$y,f2a$y+5,sep="-")
-
-breaks <- 10^(-10:10)
-minor_breaks <- rep(1:9, 21)*(10^rep(-10:10, each=9))
-
-#scale_x_log10(breaks = breaks, minor_breaks = minor_breaks) + 
-#scale_y_log10(breaks = breaks) + 
-
-
-g <- f2a %>%
-  select(-y)
-g$pct <- .4
-g$val <- c(.5,.6,.7)
-g$g <- paste("Gini (",g$period,") = ",round(g$g,2),sep="")
-
-intop <- f2b %>%
-  select(-y) %>%
-  gather(key="indi",value="val",ncs_inf)
-
-intop$pct <- 1 - intop$pct
-intop$val <- 1 - intop$val
-
-p4 <- intop %>%
-  filter(pct != 0) %>%
-  ggplot(aes(x=pct,y=val,group=period,color=period)) +
-  geom_line() + 
-  scale_x_log10("Inverse percentile rank of authors") + 
-  scale_y_continuous("Cumulative citation density") + 
-  theme(
-    panel.grid.minor = element_line(colour = "grey90", linetype="dashed",size=.25)
-  ) + 
-  scale_color_manual("Year range", values=elite_cols[1:3])
-
-p3 <- f2b %>%
-  select(-y) %>%
-  filter(pct != 1) %>%
-  gather(key="indi",value="val",ncs_inf) %>%
-  ggplot(aes(x=pct,y=val,group=period,color=period)) +
-  geom_label(data=g,aes(x = pct, y = val, label=g, group = 1),show.legend = F) +
-  geom_line() + 
-  scale_x_continuous("Author percentile") + 
-  scale_y_continuous("") + 
-  theme(
-    panel.grid.minor = element_line(colour = "grey90", linetype="dashed",size=.25)
-  ) + 
-  scale_color_manual("Year range", values=elite_cols[1:3])
-  
-
-
-
-p3b <- f1b %>% ggplot(aes(x=y,y=h)) + geom_point() +
-  scale_x_continuous("Year") + 
-  scale_y_continuous("Index value")
-
-(p4 + p3 + plot_layout(guides = "collect")) / p3b + plot_annotation(tag_levels = 'a')
+source("figures/figure_2_gen.R")
+plot
 ```
 
 ## Figure 3
 
-```{r,fig.cap="Citation concentration and inequality by field. **(a)** Field-specific Gini coefficients of citation density (full count) by percentile rank, per year from 2000 to 2017. **(b)** Changes over time in the Herfindahl index of citation concentration from 2000 to 2017. ",fig.width=8,fig.height=4}
+```{r,fig.cap="Citation gap. **(A)** plots the citation density (full count) by fraction of authors, stratified by 5-year intervals. The *x*-axis is on a logarithmic scale. **(B)** displays Gini coefficients of citation density (full count) by percentile rank, per year, from 2000 to 2015. ",fig.width=8,fig.height=4}
 
+source("figures/figure_3_gen.R")
+plot
+```
 
-f3 %>% gather("key","value",g,h) %>%
-  filter(oecd != "Humanities" & oecd != "Social Sciences" & oecd != "Engineering and Technology") %>%
-  mutate(kl = case_when(
-    key == "g" ~ "Gini",
-    key == "h" ~ "Herfindahl"
-  )) %>%
-  ggplot(aes(x = y, y = value, color = oecd, group = oecd)) + 
-  geom_line() +
-  facet_wrap(~ kl, scales = "free_y") + 
-  scale_x_continuous("Year") + 
-  scale_y_continuous("Index value") + 
-  scale_color_manual("OECD Field",values = c(elite_cols[1:3]))
+## Figure 4
+
+```{r,fig.cap="Citation concentration and inequality by field. **(A)** plots the citation density (full counting) by fraction of authors, stratified by 5-year intervals for Agricultural Sciences, Medical and Health Sciences, and Natural Sciences. The *x*-axes are on a logarithmic scale. **(B)** presents the field-specific Gini coefficients of citation density (full count) by percentile rank, per year from 2000 to 2015.",fig.width=8,fig.height=8}
+
+source("figures/figure_4_gen.R")
+plot
+```
+
+## Figure 5
+
+```{r,fig.cap="Country-level developments in the representation and concentration of elite researchers (i.e. the top 1% most cited) from 2000 to 2014, by 5-year increments. **(A)** plots changes in elite concentration within the 10 countries with the highest proportion of top-cited scientists overall. **(B)** shows changes in elite concentration within the 10 countries with the highest number of top-cited scientists overall. **(C)** displays developments in elite concentration within the 10 countries with the largest growth in proportions of elite scientists. **(D)** presents developments in elite concentration within the 10 countries with the smallest growth or largest declines in proportions of elite scientists. Trends are plotted by 5-year increments in all panels (2000-2004, 2005-2009, 2010-2014). The arrows indicate the direction of the development over time. Only countries with at least 2000 disambiguated authors and at least 30 elite researchers are included in the Figure.",fig.width=8,fig.height=8}
+
+source("figures/figure_5_gen.R")
+plot
+```
+
+## Figure 6
+
+```{r,fig.cap="University-level developments in the representation and concentration of elite researchers (i.e. the top 1% most cited) from 2000 to 2014. **(A)** shows changes in elite concentration within the 10 institutions with the highest proportion of top-cited scientists overall. **(B)** plots developments in elite concentration within the 10 institutions with the highest number of top-cited scientists overall. **(C)** displays changes in elite concentration within the 10 institutions with the largest growth in proportions of elite scientists. **(D)** shows changes in elite concentration within the 10 institutions with the smallest growth or largest decline in proportions of elite scientists. Trends are plotted by 5-year increments in all panels (2000-2004, 2005-2009, 2010-2014). The arrows indicate the direction of the development over time. Only institutions with at least 2000 disambiguated authors and at least 30 elite researchers are included in the Figure. Hospitals and medical centers have been omitted from the visualization.",fig.width=8,fig.height=8}
+
+source("figures/figure_6_gen.R")
+plot
 ```
 
 # Main document tables
@@ -178,70 +90,57 @@ f3 %>% gather("key","value",g,h) %>%
 ## Table 1
 
 ```{r,echo=F,message=F}
-t1 <- read_tsv("table1.txt")
-t1$p_total_growth <- t1$p_total_growth * 100
-t1$f_growth <- t1$f_growth * 100
-t1 <- t1[c(1,2,3,4,6,5)]
-kable(t1,col.names = c("OECD Major field","Minor field","$N$","$G$","%","$\\Delta$"),digits = 1,caption="Trends in citation concentration by field. The table reports the number ($G$) and percentage ($\\%$) of all WoS subject categories ($N$) grouped under each OECD major and minor field of science that had $>10\\%$ increase in citation concentration in the period 2012-2017 compared to the period 2000-2005. Moreover, it specifies the relative increase in concentration for each OECD minor field ($\\Delta$). Here, concentration is measured as the citation shares accrued by the top $1\\%$ most cited authors within each subfield. ")
+
 ```
 
 # Supplementary figures
 
 ## Figure S1
 
-```{r,fig.cap="The growth in covered references (left) and publications (right) in WoS, for the period 2000-2017. The red crosses show the results for the entire database, while the blue crosses show the results for papers and references included in this study.",fig.width=8,fig.height=4}
+```{r,fig.cap="The top panel shows the development in active researchers by year. The middle and lower panels show the cumulative proportion of all citations given to the top 1% researchers per year for physics and astronomy (left) and for all other disciplines (right), as total, inflation-adjusted citations (*nics*) cumulated per year from 2000 to 2015. In the middle panel the black circles plot the concentration trend for all authors, while the solid red circles plot the concentration trend in a bootstrapped sample, where the annual observations are resampled to match the sample size in year 2000. Resampling was repeated 1,000 times to calculate robust results. In the lower panel, the black circles also plot the concentration trend for all authors, while the solid red circles plot the concentration trend for a fixed set of journals throughout the period.",fig.width=8,fig.height=12}
 
-f0 %>%
-  gather("unit","value",n,nr,wos_n,wos_nr) %>%
-  mutate(src = case_when(unit == "n" ~ "Used in this study",
-                         unit == "nr" ~ "Used in this study",
-                         unit == "wos_n" ~ "Full WoS",
-                         unit == "wos_nr" ~ "Full WoS"),
-         lbl = case_when(unit == "n" ~ "Number of papers",
-                         unit == "nr" ~ "Number of covered references",
-                         unit == "wos_n" ~ "Number of papers",
-                         unit == "wos_nr" ~ "Number of covered references")) %>%
-  ggplot(aes(x=pub_year,y=value,group=src,color=src)) + 
-  facet_wrap( ~ lbl, scales = "free_y") +
-  geom_point(shape=4) + 
-  scale_y_continuous("",labels = scales::scientific) + 
-  scale_x_continuous("Publication year") + 
-  scale_color_manual("Sample",values=elite_cols[1:2])
+source("figures/figure_S1_gen.R")
+plot
 ```
 
 ## Figure S2
 
-```{r,fig.cap="The top panel shows the development in active researchers by year. The bottom panel shows the proportion of all citations given to the top 1% researchers per year. In the bottom-left figure, we use all authors, while in the right panel, the annual observations are resampled to match the sample size in year 2000. Resampling is repeated 1,000 times (bootstrapping), in order to calculate robust results. The observations are practically identical.",fig.width=8,fig.height=4}
+```{r,fig.cap="Publication, citation and collaboration trends in physics and astronomy. **(A)** plots changes over time in the share of total papers accrued by the top 1% (99th percentile), 75th and 50th percentile from 2000-2015. **(B)** plots the relative growth in average publication output per year (per author) for the top 99th, 75th and 50th percentile based on a full and fractional counting of papers. **(C)** presents the mean citation rate per paper (per year) for the 99th percentile. **(D)** shows the mean proportion of papers with at least one co-author for the 99th, 75th and 50th percentile. **(E)** displays the average number of coauthors per year for the 50th, 75th and 99th percentile. **(F)** plots the annual mean and median number of co-authors per paper for authors in the three percentile bins. In all panels, the black lines and dots show the 99th percentile, red shows the 75th percentile and blue shows the 50th percentile. Solid dots show the scores by full count and hollow dots show fractional counts. Solid squares show the median and hollow squares show the mean. **(B)**, **(C)** and **(F)** are split into two facets with common *x*-axes and individual *y*-axes.",fig.width=8,fig.height=6}
 
-ps1 <- f1 %>%
-  gather("indi","val",ncs_inf_full,ncs_boot) %>%
-  mutate(indi_g = case_when(
-    indi == "ncs_boot" ~ "Bootstrapped",
-    indi == "ncs_inf_full" ~ "All authors",
-  )) %>%
-  ggplot(aes(x = y, y = val)) + 
-  geom_point() + 
-  facet_wrap(~indi_g) +
-  geom_smooth(method='lm',alpha=.3,size=.5,color=1) +
-  scale_y_continuous("Proportion of all citations") + 
-  scale_x_continuous("Year")
-
-ps3 <- f1 %>% ggplot(aes(x=y,y=nfolks)) + geom_line() + 
-  scale_y_continuous("N, authors", limits=c(0,NA),labels = scales::scientific) + 
-  scale_x_continuous("Year")
-
-ps3 / ps1 + plot_layout(guides = "collect")
+source("figures/figure_S2_gen.R")
+plot
 ```
 
-# Supplementary tables
+## Figure S3
 
-## Table S1
+```{r,fig.cap="Cumulative citation density distributions for countries **(S3A)** and institutions **(S3B)**, using the inverted rank quantiles on the *x*-axes, corresponding to Fig. **3A**. The curves show the same time intervals as in Fig. **3**.",fig.width=8,fig.height=4}
 
-```{r,echo=F,message=F}
-ts1 <- read_tsv("table_s1.txt")
-ts1 <- ts1[c(5,2,3,4)]
-ts1$top1 <- ts1$top1 * 100
-ts1$top2 <- ts1$top2 * 100
-ts1$grow <- ts1$grow * 100
-kable(ts1,col.names = c("WoS Subject category","$c$(2000-2005)","$c$(2012-2017)","Relative change"),digits = 1,caption="Overview of the concentration, $c$, of citations given to authors in the 99th percentile (i.e. the top 1% most cited) in the periods 2000-2005 and 2012-2017, grouped by Web of Science journal subject category. The rightmost column is the relative change from the early to the late period.")
+source("figures/figure_S3_gen.R")
+plot
 ```
+
+## Figure S4
+
+```{r,fig.cap="Mean papers per author for a select set of countries, using fractional paper counts. Scores are first weighted by the number of papers per field and then by the number of authors of that field in the respective country. This removes the influence of different field profiles for countries. All countries, except for South Korea are stable during the entire period, with only small changes. South Korea grows from a lower to a higher than expected number of papers per author, which aligns well with the country’s large economic growth and upsurge in R&D investments over the past two decades. If the algorithm were systematically more likely to bundle East-Asian authors with similar names, we would expect to see higher (and increasing) mean number of papers per author in China and Taiwan compared to the reference countries, but this is not the case.",fig.width=8,fig.height=4}
+
+source("figures/figure_S4_gen.R")
+plot
+```
+
+## Figure S5
+
+```{r,fig.cap="The growth in covered references (left) and publications (right) in WoS, for the period 2000-2015. The black crosses show the results for the entire database, while the red crosses show the results for papers and references included in this study.",fig.width=8,fig.height=4}
+
+source("figures/figure_S5_gen.R")
+plot
+```
+
+## Figure S6
+
+```{r,fig.cap="Annual developments in the Gini coefficients for citation imbalance in the full sample (same as Fig. 3B in the manuscript) and a bootstrapped sample, where the annual observations are resampled to match the sample size in year 2000.",fig.width=8,fig.height=4}
+
+source("figures/figure_S6_gen.R")
+plot
+```
+
+

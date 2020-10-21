@@ -1,16 +1,14 @@
-major_field	minor_field	n_field	n_growth	p_total_growth	f_growth
-Agricultural Sciences	Agriculture, forestry, fisheries	6	3	0.09408572385982095	0.5
-Agricultural Sciences	Animal and dairy science	1	0	0.07976026648752788	0
-Agricultural Sciences	Other agricultural science	2	2	0.12835493048885183	1
-Agricultural Sciences	Veterinary science	1	0	0.0240885723516584	0
-Engineering and Technology	Other engineering and technologies	1	1	0.12582536744325168	1
-Medical and Health Sciences	Basic medical research	10	4	0.07567849848001029	0.4
-Medical and Health Sciences	Clinical medicine	32	25	0.334096515771932	0.78125
-Medical and Health Sciences	Health sciences	12	6	0.33545566641036295	0.5
-Natural Sciences	Biological sciences	21	5	0.101399550626327	0.23809523809523808
-Natural Sciences	Chemical sciences	9	1	-0.02860727906090077	0.1111111111111111
-Natural Sciences	Computer and information sciences	1	0	-0.09595226713640448	0
-Natural Sciences	Earth and related environmental sciences	8	1	0.059175533945607484	0.125
-Natural Sciences	Mathematics	4	1	-0.013484064614349145	0.25
-Natural Sciences	Other natural sciences	1	1	0.11101658017355542	1
-Natural Sciences	Physical sciences and astronomy	10	1	0.005377477383301521	0.1
+major_field	minor_field	n	g_tncs	g_p	g_n	pp_tncs	pp_p	pp_n	delta_tncs
+Agricultural Sciences	Agriculture, forestry, fisheries	6	4	2	1	0.6666666666666666	0.3333333333333333	0.16666666666666666	12.531977654533355
+Agricultural Sciences	Animal and dairy science	1	0	1	1	0	1	1	6.4279565716401255
+Agricultural Sciences	Other agricultural science	4	3	2	4	0.75	0.5	1	-15.351314601921985
+Agricultural Sciences	Veterinary science	1	0	1	0	0	1	0	8.868064955392274
+Medical and Health Sciences	Basic medical research	10	3	1	3	0.3	0.1	0.3	5.0509992281765115
+Medical and Health Sciences	Clinical medicine	32	24	13	22	0.75	0.40625	0.6875	26.717705643058665
+Medical and Health Sciences	Health sciences	17	7	7	7	0.4117647058823529	0.4117647058823529	0.4117647058823529	11.648362287188796
+Natural Sciences	Biological sciences	21	8	6	11	0.38095238095238093	0.2857142857142857	0.5238095238095238	26.848724119533095
+Natural Sciences	Chemical sciences	9	2	2	2	0.2222222222222222	0.2222222222222222	0.2222222222222222	-6.621329108094354
+Natural Sciences	Computer and information sciences	8	2	2	1	0.25	0.25	0.125	0.5823446762466045
+Natural Sciences	Earth and related environmental sciences	10	3	6	6	0.3	0.6	0.6	5.328524558394143
+Natural Sciences	Mathematics	7	0	3	4	0	0.42857142857142855	0.5714285714285714	-0.9556261526146637
+Natural Sciences	Other natural sciences	1	0	0	0	0	0	0	-21.56416240635739
