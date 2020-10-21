@@ -24,6 +24,7 @@ require(tidyverse)
 require(ggrepel)
 require(patchwork)
 require(knitr)
+require(kableExtra)
 
 elite_cols <- c("#000000","#A61A00","#0A7EA4","#FFDF00","#5B2333")
 
@@ -90,6 +91,20 @@ plot
 ## Table 1
 
 ```{r,echo=F,message=F}
+t <- read_tsv("table1.txt")
+
+t <- t %>%
+  select(major_field,minor_field,n,g_tncs,delta_tncs,g_n,delta_n,size)
+
+kable(t,col.names = c("OECD Major field",
+                      "Minor field",
+                      "$N$",
+                      "$G_{nics}$",
+                      "$\\Delta_{nics}$ (%)",
+                      "$G_n$",
+                      "$\\Delta_n$ (%)",
+                      "$P$"), digits = 1) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
 
 ```
 
